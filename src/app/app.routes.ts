@@ -31,6 +31,16 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./features/reports/reports.routes').then(m => m.REPORTS_ROUTES),
       },
+      {
+        path: 'rh',
+        loadChildren: () =>
+          import('./features/rh/rh.routes').then(m => m.RH_ROUTES),
+      },
+      {
+        path: 'training',
+        loadChildren: () =>
+          import('./features/training/training.routes').then(m => m.TRAINING_ROUTES),
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

@@ -94,6 +94,16 @@ export class Dashboard implements OnInit {
       color:    '#ef4444',
       accentBg: 'red',
     },
+    {
+      label:    'Capacitación',
+      value:    '—',
+      delta:    '',
+      deltaUp:  true,
+      sub:      'Capacitaciones completadas',
+      data:     [1],
+      color:    '#8b5cf6',
+      accentBg: 'violet',
+    },
   ];
 
   // ── Ranking fallback ─────────────────────────────────────────────────────
