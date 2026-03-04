@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/services/auth.service';
 import { RhService } from '../services/rh.service';
 import { KpiService } from '../../kpi/services/kpi.service';
+import { ReportService } from '../../reports/services/report.service';
 import { ROL_LABELS, ROLES_DISPONIBLES, TURNOS, UpdateUserRequest } from '../rh.models';
 
 @Component({
@@ -15,12 +16,13 @@ import { ROL_LABELS, ROLES_DISPONIBLES, TURNOS, UpdateUserRequest } from '../rh.
   templateUrl: './user-profile.html',
 })
 export class UserProfile implements OnInit {
-  private readonly authSvc = inject(AuthService);
-  private readonly rhSvc   = inject(RhService);
-  private readonly kpiSvc  = inject(KpiService);
-  private readonly route   = inject(ActivatedRoute);
-  private readonly router  = inject(Router);
-  private readonly fb      = inject(FormBuilder);
+  private readonly authSvc    = inject(AuthService);
+  private readonly rhSvc      = inject(RhService);
+  private readonly kpiSvc     = inject(KpiService);
+  private readonly reportSvc  = inject(ReportService);
+  private readonly route      = inject(ActivatedRoute);
+  private readonly router     = inject(Router);
+  private readonly fb         = inject(FormBuilder);
 
   readonly user        = this.rhSvc.selectedUser;
   readonly loading     = this.rhSvc.loading;
@@ -36,8 +38,9 @@ export class UserProfile implements OnInit {
   readonly isGerente = computed(() => this.authSvc.hasAnyRole('ADMIN', 'GERENTE'));
 
   // ── Estado de UI ───────────────────────────────────────────────────────────
-  readonly editMode     = signal(false);
-  readonly confirmDeact = signal(false);
+  readonly editMode        = signal(false);
+  readonly confirmDeact    = signal(false);
+  readonly downloadingCard = signal(false);
 
   // ── KPI #7: datos de este colaborador ────────────────────────────────────
   readonly userKpi = computed(() => {
@@ -131,6 +134,18 @@ export class UserProfile implements OnInit {
     } catch {
       this.confirmDeact.set(false);
     }
+  }
+
+  downloadCard(userId: string): void {
+    if (this.downloadingCard()) return;
+    this.downloadingCard.set(true);
+    this.reportSvc.downloadPerformanceCard(userId).subscribe({
+      next: blob => {
+        this.reportSvc.triggerDownload(blob, `ficha-${userId}.pdf`);
+        this.downloadingCard.set(false);
+      },
+      error: () => this.downloadingCard.set(false),
+    });
   }
 
   igeoClass(igeo: number): string {
